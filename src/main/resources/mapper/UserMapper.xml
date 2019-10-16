@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.winterchen.dao.UserDao" >
+    <sql id="BASE_TABLE">
+        t_user
+    </sql>
+
+    <sql id="BASE_COLUMN">
+        userId,userName,password,phone
+    </sql>
+
+    <insert id="insert" parameterType="com.winterchen.model.UserDomain">
+        INSERT INTO
+        <include refid="BASE_TABLE"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            userName,password,
+            <if test="phone != null">
+                phone,
+            </if>
+        </trim>
+        <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
+            #{userName, jdbcType=VARCHAR},#{password, jdbcType=VARCHAR},
+            <if test="phone != null">
+                #{phone, jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="selectUsers" resultType="com.winterchen.model.UserDomain">
+        SELECT
+        <include refid="BASE_COLUMN"/>
+        FROM
+        <include refid="BASE_TABLE"/>
+    </select>
+
+    <select id="findUserById" resultType="com.winterchen.model.UserDomain">
+        SELECT
+        <include refid="BASE_COLUMN"/>
+        FROM
+        <include refid="BASE_TABLE"/>
+        where userId = #{userId}
+    </select>
+
+    <select id="findByUserName"  resultType="com.winterchen.model.SysUser">
+        SELECT
+        id,
+        user_name as userName,
+        password
+        FROM
+        sys_user
+        where user_name = #{userName}
+    </select>
+
+    <select id="getUserRolesSet" resultType="java.lang.String">
+        SELECT role_name
+        FROM sys_role
+        WHERE id IN
+        (
+            SELECT role_id
+            FROM user_role
+            WHERE user_id = (SELECT id FROM sys_user WHERE user_name=#{userName})
+        )
+    </select>
+
+    <select id="getUserPermissionsSet" resultType="java.lang.String">
+        SELECT sp.url
+        FROM sys_permission sp
+        LEFT JOIN role_permission rp ON rp.permission_id = sp.id
+        LEFT JOIN sys_role sr ON sr.id = rp.role_id
+        LEFT JOIN user_role ur ON ur.role_id = sr.id
+        LEFT JOIN sys_user su ON su.id = ur.user_id
+        WHERE su.user_name = #{userName}
+        AND sp.del_flag = 0
+    </select>
+
+    <select id="getUserApiList" resultType="java.lang.String">
+        SELECT url FROM sys_role_api sra
+        LEFT JOIN user_role sur ON sur.role_id = sra.role_id
+        LEFT JOIN sys_user su ON su.id = sur.user_id
+        WHERE su.user_name = #{userName}
+    </select>
+
+    <select id="getUserList" resultType="com.winterchen.model.SysUser">
+        SELECT
+        id,
+        user_name as userName,
+        password
+        FROM
+        sys_user
+    </select>
+
+    <insert id="saveSysUser" parameterType="com.winterchen.model.SysUser">
+        INSERT INTO
+        sys_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            id,user_name,password,
+        </trim>
+        <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
+            #{id, jdbcType=BIGINT},#{userName, jdbcType=VARCHAR},#{password, jdbcType=VARCHAR},
+        </trim>
+    </insert>
+
+
+</mapper>
