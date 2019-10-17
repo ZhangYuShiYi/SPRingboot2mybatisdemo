@@ -138,7 +138,7 @@ public class UserController {
      * 退出登录
      * @param request
      * @param response
-     * @return
+     * @return1
      */
     @RequestMapping(value = "/logout")
     public Object logout(HttpServletRequest request,HttpServletResponse response) {
