@@ -3,6 +3,7 @@ package com.winterchen.service.user;
 import com.github.pagehelper.PageInfo;
 import com.winterchen.model.SysUser;
 import com.winterchen.model.UserDomain;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,5 +31,7 @@ public interface UserService {
     List<SysUser> getUserList();
 
     int saveSysUser(SysUser sysUser);
+
+    String importExcel(MultipartFile file);
 
 }

@@ -1,18 +1,20 @@
 package com.winterchen.service.user.impl;
 
+import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.winterchen.dao.UserDao;
 import com.winterchen.model.SysUser;
 import com.winterchen.model.UserDomain;
 import com.winterchen.service.user.UserService;
+import com.winterchen.util.ExcelUtil;
+import com.winterchen.util.SnowFlake;
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.*;
 
 /**
  * Created by zy on 2019/8/2.
@@ -79,6 +81,126 @@ public class UserServiceImpl implements UserService {
     @Override
     public int saveSysUser(SysUser sysUser) {
         return userDao.saveSysUser(sysUser);
+    }
+
+    @Override
+    public String importExcel(MultipartFile file) {
+        StringBuffer stringBuffer = new StringBuffer();
+        ExcelImportResult<SysUser> result = ExcelUtil.importExcel(file, SysUser.class);
+        if (result != null) {
+            Sheet sheet = result.getWorkbook().getSheetAt(0);
+            //行数
+            int lineNum = sheet.getLastRowNum();
+            if(0 == lineNum){
+                stringBuffer.append("Excel内没有数据！");
+            }
+            //校验样品编号重复
+            stringBuffer.append(checkData(sheet,lineNum));
+            if (stringBuffer.length() != 0)
+                return stringBuffer.toString();
+            return "";
+        }
+        return "获取上传失败";
+    }
+
+    private String checkData(Sheet sheet,Integer lineNum){
+        StringBuffer stringBuffer = new StringBuffer();
+        SysUser model = null;
+        //获得所有数据
+        for(int i = 1; i <= lineNum; i++){
+            model = new SysUser();
+            int count = i + 1;// 记录实际行号
+            Boolean flag = true;
+            String userName = ExcelUtil.getRightTypeCell(sheet.getRow(i).getCell(0)).trim();		//userName
+            String password = ExcelUtil.getRightTypeCell(sheet.getRow(i).getCell(1)).trim();		//password
+
+            if(StringUtils.isBlank(userName)){
+                stringBuffer.append("第"+ count +"行,用户名称不能为空</br>");
+                flag = false;
+            }
+
+            if(StringUtils.isBlank(password)){
+                stringBuffer.append("第"+ count +"行,用户密码不能为空</br>");
+                flag = false;
+            }
+            /*if(StringUtils.isNotBlank(productCode)){
+                ProductModel productModel =  productModelMapper.findByProductCode(productCode);
+                if(productModel != null){
+                    model.setProductCode(productCode);
+                    model.setProductName(productModel.getName()!=null?productModel.getName():null);
+                    model.setProductType(productModel.getDescription()!=null?productModel.getDescription():null);
+                    model.setOrderNumber(getReplenishmentNo("".equals(productModel.getProductno())?"":productModel.getProductno()));
+                }else{
+                    stringBuffer.append("第"+ count +"行,商品编号"+productCode+"查询不到商品信息</br>");
+                    flag = false;
+                }
+            }
+            if(StringUtils.isBlank(num)){
+                stringBuffer.append("第"+ count +"行,商品补货数量不能为空</br>");
+                flag = false;
+            }
+            if(StringUtils.isNotBlank(num)){
+                if(!BaseUtils.isInteger(num)){
+                    stringBuffer.append("第"+ count +"行,商品补货数量不是数字</br>");
+                    flag = false;
+                }
+            }
+
+            if(StringUtils.isBlank(arrivalTime)){
+                stringBuffer.append("第"+ count +"行,期望到货时间不能为空</br>");
+                flag = false;
+            }
+            SimpleDateFormat sbf1 = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat sbf2 = new SimpleDateFormat("yyyy-MM-dd");
+            if(StringUtils.isNotBlank(arrivalTime)){
+                Date arrivalDate = null;
+                try {
+                    if(arrivalTime.indexOf("/") != -1){
+                        arrivalDate = sbf1.parse(arrivalTime);
+                    }else{
+                        arrivalDate = sbf2.parse(arrivalTime);
+                    }
+                    model.setArrivalTime(arrivalDate);
+                } catch (Exception e) {
+                    stringBuffer.append("第"+ count +"行,期望到货时间格式有误</br>");
+                    flag = false;
+                }
+            }
+
+            if(StringUtils.isBlank(phone)){
+                stringBuffer.append("第"+ count +"行,收货人电话号码不能为空</br>");
+                flag = false;
+            }
+            if(StringUtils.isNotBlank(phone)){
+                if(!BaseUtils.isMobile(phone)){
+                    stringBuffer.append("第"+ count +"行,收货人电话号码格式有误</br>");
+                    flag = false;
+                }
+            }
+
+            if(StringUtils.isBlank(email)){
+                stringBuffer.append("第"+ count +"行,业务邮箱不能为空</br>");
+                flag = false;
+            }
+            if(StringUtils.isNotBlank(email)){
+                if(!BaseUtils.isEmail(email)){
+                    stringBuffer.append("第"+ count +"行,业务邮箱账号格式有误</br>");
+                    flag = false;
+                }
+            }*/
+
+            if(flag){
+                model.setId(SnowFlake.getSnowFlake().nextId());
+                model.setUserName(userName);
+                model.setPassword(password);
+                userDao.saveSysUser(model);
+            }
+
+        }
+        if(stringBuffer.length() != 0){
+            return stringBuffer.toString();
+        }
+        return "";
     }
 
 

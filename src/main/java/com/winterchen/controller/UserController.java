@@ -23,8 +23,11 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.net.URLEncoder;
 import java.util.List;
@@ -70,6 +73,7 @@ public class UserController {
         /*if (mobileCode == null) {
             return 0;
         }*/
+        /*request.getSession().setAttribute("xxx", "xxxxx");*/
         redisUtil.del(phone);
         return userService.findAllUser(pageNum,pageSize);
     }
@@ -77,7 +81,7 @@ public class UserController {
     //验证springboot引入JWT
     @PostMapping("/login")
     @ResponseBody
-    public Object login(@RequestBody SysUser user){
+    public Object login(HttpServletRequest request,@RequestBody SysUser user){
         JSONObject jsonObject=new JSONObject();
         SysUser userForBase=userService.findByUserName(user.getUserName());
         if(userForBase==null){
@@ -97,6 +101,10 @@ public class UserController {
 
                 jsonObject.put("token", token);
                 jsonObject.put("user", userForBase);
+
+                HttpSession session = request.getSession();
+                session.setAttribute("isLogin", true);
+
                 return jsonObject;
             }
         }
@@ -140,7 +148,7 @@ public class UserController {
      * @param response
      * @return1
      */
-    @RequestMapping(value = "/logout")
+    @PostMapping(value = "/logout")
     public Object logout(HttpServletRequest request,HttpServletResponse response) {
         //用户退出逻辑
         JSONObject jsonObject=new JSONObject();
@@ -184,9 +192,9 @@ public class UserController {
         Workbook workbook = ExcelExportUtil.exportExcel(params, SysUser.class, userList);
         workbook.write(response.getOutputStream());
     }
-    @GetMapping("/importExcel")
-    @ApiOperation("上传Excel文件")
-    public void importExcel() throws Exception {
+    @GetMapping("/importLocalExcel")
+    @ApiOperation("上传本地Excel文件")
+    public void importLocalExcel() throws Exception {
         ExcelUtils poi = new ExcelUtils(new File("E:\\chest.xls"));
 
         List<Object[]> list = poi.getAllData(0);
@@ -213,7 +221,23 @@ public class UserController {
             }
         }
     }
-
+    /**
+     * 	通过前端页面，批量导入Excel模板数据
+     */
+    @ApiOperation(value="导入Excel模板进行批量上传", notes="导入Excel模板进行批量上传")
+    @PostMapping(value="/importExcel")
+    public Object importExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request){
+        JSONObject jsonObject=new JSONObject();
+        String mes = userService.importExcel(file);
+        if(StringUtils.isNotBlank(mes)){
+            jsonObject.put("code","1");
+            jsonObject.put("msg",mes);
+            return jsonObject;
+        }
+        jsonObject.put("code","0");
+        jsonObject.put("msg","操作成功！");
+        return jsonObject;
+    }
 
 
 

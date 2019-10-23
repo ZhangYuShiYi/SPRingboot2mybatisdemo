@@ -17,6 +17,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -27,7 +28,7 @@ import java.util.Map;
  * @author 调用shiro之前用过滤器实现api接口权限控制，维护一张角色与api接口关系表即可：sys_role_api
  *
  */
-/*@WebFilter*/
+@WebFilter
 public class RequestFilter implements Filter {
 
 	private Logger logger = LoggerFactory.getLogger(RequestFilter.class);
@@ -72,7 +73,7 @@ public class RequestFilter implements Filter {
 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 		//2、获取请求里的请求路径
 		String requestURI = httpServletRequest.getRequestURI();
-		if(requestURI.indexOf("/user/login") == -1){
+		if(requestURI.indexOf("/user/login") == -1 && requestURI.indexOf("/swagger-ui.html") == -1){
 			//1、获取请求里的参数
 			String token = httpServletRequest.getHeader("token");
 			/*String userId = JWT.decode(token).getAudience().get(0);*/   //第一种方式存进token
@@ -91,7 +92,14 @@ public class RequestFilter implements Filter {
 				boolean flag = userApiList.contains(requestURI);
 				if(flag){
 				}else {
-					logger.error("用户没有权限");
+					logger.error("用户没有api接口权限");
+					throw new ServletException("用户没有api接口权限");
+				}
+
+				HttpSession session = httpServletRequest.getSession();
+				boolean res = (boolean)session.getAttribute("isLogin");
+				if(!res){
+					logger.error("session中isLogin为false");
 					throw new ServletException("用户没有权限");
 				}
 			}
