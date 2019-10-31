@@ -38,7 +38,8 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
+			<version>8.0.11</version>
+			<!--<scope>runtime</scope>-->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -106,10 +107,10 @@
 			<artifactId>spring-session-data-redis</artifactId>
 		</dependency>-->
 		<!-- 5、整合quartz定时任务 -->
-		<dependency>
+		<!--<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-quartz</artifactId>
-		</dependency>
+		</dependency>-->
 		<!-- 6、整合JWT -->
 		<dependency>
 			<groupId>com.auth0</groupId>
@@ -147,6 +148,29 @@
 			<version>1.0.2</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- 11、aspectj-->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.8.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.8.9</version>
+		</dependency>
+
+		<!-- httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+
 
 
 	</dependencies>
@@ -172,7 +196,7 @@
 					<dependency>
 						<groupId>mysql</groupId>
 						<artifactId>mysql-connector-java</artifactId>
-						<version>5.1.45</version>
+						<version>8.0.11</version>
 					</dependency>
 				</dependencies>
 			</plugin>

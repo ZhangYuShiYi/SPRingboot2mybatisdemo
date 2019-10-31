@@ -16,6 +16,8 @@ public interface UserService {
 
     int addUser(UserDomain user);
 
+    int addSysUser(SysUser user);
+
     PageInfo<UserDomain> findAllUser(int pageNum, int pageSize);
 
     UserDomain findUserById(Integer userId);
@@ -33,5 +35,13 @@ public interface UserService {
     int saveSysUser(SysUser sysUser);
 
     String importExcel(MultipartFile file);
+
+    //mutildatabase
+    List<SysUser> findAll1();
+    List<SysUser> findAll2();
+    Long add1(String userName,String password);
+    Long add2(String userName,String password);
+
+
 
 }

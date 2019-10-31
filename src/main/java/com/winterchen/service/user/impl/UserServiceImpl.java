@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.winterchen.dao.UserDao;
 import com.winterchen.model.SysUser;
 import com.winterchen.model.UserDomain;
+import com.winterchen.mutildatabaseTransactionAop.MyDataSource;
 import com.winterchen.service.user.UserService;
 import com.winterchen.util.ExcelUtil;
 import com.winterchen.util.SnowFlake;
@@ -14,6 +15,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import javax.management.RuntimeErrorException;
 import java.util.*;
 
 /**
@@ -29,6 +31,11 @@ public class UserServiceImpl implements UserService {
     public int addUser(UserDomain user) {
 
         return userDao.insert(user);
+    }
+
+    @Override
+    public int addSysUser(SysUser user) {
+        return userDao.addSysUser(user);
     }
 
     /*
@@ -202,6 +209,48 @@ public class UserServiceImpl implements UserService {
         }
         return "";
     }
+
+
+    //mutildatabase
+    @MyDataSource()
+    @Override
+    public List<SysUser> findAll1() {
+        return userDao.getUserList();
+    }
+
+    @MyDataSource("datasource2")
+    @Override
+    public List<SysUser> findAll2() {
+        return userDao.getUserList();
+    }
+
+    @MyDataSource()
+    @SuppressWarnings("unused")
+    @Override
+    public Long add1(String userName,String password) {
+        SysUser sysUser = new SysUser();
+        Long id = SnowFlake.getSnowFlake().nextId();
+        sysUser.setId(id);
+        sysUser.setUserName(userName);
+        sysUser.setPassword(password);
+        int res = userDao.saveSysUser(sysUser);
+        throw new RuntimeErrorException(new Error("error!!!!!"));
+    }
+
+    @MyDataSource("datasource2")
+    @SuppressWarnings("unused")
+    @Override
+    public Long add2(String userName,String password) {
+        SysUser sysUser = new SysUser();
+        Long id = SnowFlake.getSnowFlake().nextId();
+        sysUser.setId(id);
+        sysUser.setUserName(userName);
+        sysUser.setPassword(password);
+        int res = userDao.saveSysUser(sysUser);
+        throw new RuntimeErrorException(new Error("error!!!!!"));
+    }
+
+
 
 
 }

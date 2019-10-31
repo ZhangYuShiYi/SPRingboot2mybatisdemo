@@ -2,6 +2,7 @@ package com.winterchen.webConfig.integration;
 
 
 import com.auth0.jwt.JWT;
+import com.winterchen.model.SysUser;
 import com.winterchen.service.user.UserService;
 import com.winterchen.util.JwtUtil;
 import org.apache.shiro.authc.AuthenticationException;
@@ -28,7 +29,7 @@ import java.util.Map;
  * @author 调用shiro之前用过滤器实现api接口权限控制，维护一张角色与api接口关系表即可：sys_role_api
  *
  */
-@WebFilter
+/*@WebFilter*/
 public class RequestFilter implements Filter {
 
 	private Logger logger = LoggerFactory.getLogger(RequestFilter.class);
@@ -98,6 +99,7 @@ public class RequestFilter implements Filter {
 
 				HttpSession session = httpServletRequest.getSession();
 				boolean res = (boolean)session.getAttribute("isLogin");
+                SysUser sysUser = (SysUser) session.getAttribute(session.getId());
 				if(!res){
 					logger.error("session中isLogin为false");
 					throw new ServletException("用户没有权限");

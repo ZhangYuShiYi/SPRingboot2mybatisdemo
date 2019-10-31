@@ -4,27 +4,23 @@ import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.winterchen.annotation.PassToken;
 import com.winterchen.annotation.UserLoginToken;
 import com.winterchen.model.SysUser;
-import com.winterchen.model.User;
 import com.winterchen.model.UserDomain;
 import com.winterchen.service.user.UserService;
 import com.winterchen.util.*;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -40,20 +36,28 @@ import java.util.List;
 @Api(tags = "集成测试相关接口",description = "UserController")
 public class UserController {
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     private UserService userService;
     @Autowired
     private RedisUtil redisUtil;
 
     @ResponseBody
-    @PostMapping("/add")
-    public int addUser(UserDomain user){
+    @PostMapping("/addDomain")
+    public int addDomain(UserDomain user){
         int mobile_code = (int) ((Math.random() * 9 + 1) * 100000);
         boolean flag = redisUtil.set(user.getPhone(),String.valueOf(mobile_code), 100);
         if (flag == false) {
             return 0;
         }
         return userService.addUser(user);
+    }
+    @ResponseBody
+    @PostMapping("/add")
+    public int addSysUser(SysUser user){
+        user.setId(SnowFlake.getSnowFlake().nextId());
+        return userService.addSysUser(user);
     }
 
     @ResponseBody
@@ -69,6 +73,7 @@ public class UserController {
                     int pageSize,
             @RequestParam(name = "phone", required = false, defaultValue = "10")
                     String phone){
+        logger.info("查询所有的UserDomain");
         String mobileCode = redisUtil.get(phone);
         /*if (mobileCode == null) {
             return 0;
@@ -102,9 +107,10 @@ public class UserController {
                 jsonObject.put("token", token);
                 jsonObject.put("user", userForBase);
 
+                String requestURI = request.getRequestURI();
                 HttpSession session = request.getSession();
                 session.setAttribute("isLogin", true);
-
+                session.setAttribute(session.getId(),userForBase);
                 return jsonObject;
             }
         }
@@ -137,9 +143,13 @@ public class UserController {
         } else {
             userName = JwtUtil.getUsername(token);
         }
+        boolean isLogin = (boolean) request.getSession().getAttribute("isLogin");
+        SysUser sysUser = (SysUser) request.getSession().getAttribute(request.getSession().getId());
         jsonObject.put("msg", "你已通过验证");
         jsonObject.put("userId", userId);
         jsonObject.put("userName", userName);
+        jsonObject.put("sysUser", sysUser);
+        logger.info("查询message");
         return jsonObject;
     }
     /**
@@ -168,6 +178,9 @@ public class UserController {
             //清空用户权限缓存：权限Perms和角色集合
             /*redisUtil.del(CommonConstant.LOGIN_USER_CACHERULES_ROLE + username);
             redisUtil.del(CommonConstant.LOGIN_USER_CACHERULES_PERMISSION + username);*/
+
+            request.getSession().removeAttribute(request.getSession().getId());
+
             jsonObject.put("code","0");
             jsonObject.put("msg","退出登录成功！");
             return jsonObject;
@@ -221,10 +234,7 @@ public class UserController {
             }
         }
     }
-    /**
-     * 	通过前端页面，批量导入Excel模板数据
-     */
-    @ApiOperation(value="导入Excel模板进行批量上传", notes="导入Excel模板进行批量上传")
+    @ApiOperation(value="通过前端页面，批量导入Excel模板数据", notes="通过前端页面，批量导入Excel模板数据")
     @PostMapping(value="/importExcel")
     public Object importExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request){
         JSONObject jsonObject=new JSONObject();
@@ -237,6 +247,30 @@ public class UserController {
         jsonObject.put("code","0");
         jsonObject.put("msg","操作成功！");
         return jsonObject;
+    }
+
+    //多数据源：mutilDatabase验证
+    @GetMapping("/all1")
+    @ResponseBody
+    public Object all1() {
+        logger.info("多数据源查询数据库1中的数据");
+        return userService.findAll1();
+    }
+    @GetMapping("/all2")
+    @ResponseBody
+    public Object all2() {
+        logger.info("多数据源查询数据库2中的数据");
+        return userService.findAll2();
+    }
+    @GetMapping("/add1")
+    @ResponseBody
+    public Object add1() {
+        return userService.add1("111", "111");
+    }
+    @GetMapping("/add2")
+    @ResponseBody
+    public Object add2() {
+        return userService.add2("222", "222");
     }
 
 

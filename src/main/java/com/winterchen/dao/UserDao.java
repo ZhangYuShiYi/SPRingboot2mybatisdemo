@@ -18,6 +18,8 @@ public interface UserDao {
 
     int insert(UserDomain record);
 
+    int addSysUser(SysUser user);
+
     List<UserDomain> selectUsers();
 
     UserDomain findUserById(@Param("userId") Integer userId);

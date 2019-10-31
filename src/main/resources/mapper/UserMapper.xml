@@ -26,6 +26,12 @@
         </trim>
     </insert>
 
+    <insert id="addSysUser" >
+        insert into
+		sys_user(id,user_name,password)
+		values (#{id},#{userName},#{password})
+    </insert>
+
     <select id="selectUsers" resultType="com.winterchen.model.UserDomain">
         SELECT
         <include refid="BASE_COLUMN"/>
