@@ -8,11 +8,13 @@ import com.winterchen.model.SysUser;
 import com.winterchen.model.UserDomain;
 import com.winterchen.mutildatabaseTransactionAop.MyDataSource;
 import com.winterchen.service.user.UserService;
+import com.winterchen.util.CacheConstant;
 import com.winterchen.util.ExcelUtil;
 import com.winterchen.util.SnowFlake;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import javax.management.RuntimeErrorException;
@@ -26,6 +28,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;//这里会报错，但是并不会影响
+
 
     @Override
     public int addUser(UserDomain user) {
@@ -45,6 +48,7 @@ public class UserServiceImpl implements UserService {
     * pageSize 每页显示的数据条数
     * */
     @Override
+    @Cacheable(value = CacheConstant.DOMAIN_INFO_CACHE)
     public PageInfo<UserDomain> findAllUser(int pageNum, int pageSize) {
         //将参数传给这个方法就可以实现物理分页了，非常简单。
         PageHelper.startPage(pageNum, pageSize);
@@ -54,6 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(cacheNames = CacheConstant.DOMAIN_INFO_CACHE, key = "#userId")
     public UserDomain findUserById(Integer userId) {
         return userDao.findUserById(userId);
     }

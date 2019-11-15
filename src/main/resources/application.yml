@@ -31,6 +31,12 @@ spring:
 
     profiles:
         include: redis
+    cache:
+        #ehcache配置文件路径
+        ehcache:
+          config: classpath:/encache/encache.xml
+        #指定缓存类型，可加可不加
+        #type: ehcache
 
 
 ## 该配置节点为独立的节点，有很多同学容易将这个配置放在spring的节点下，导致配置无法被识别

@@ -5,28 +5,45 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.winterchen.annotation.UserLoginToken;
+import com.winterchen.im.Request163HttpUtil;
+import com.winterchen.im.RequestURLUtilEnum;
 import com.winterchen.model.SysUser;
 import com.winterchen.model.UserDomain;
 import com.winterchen.service.user.UserService;
 import com.winterchen.util.*;
+import com.winterchen.utilCommon.PasswordUtil;
+import com.winterchen.utilCommon.oConvertUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * Created by zy on 2019/8/2.
@@ -37,14 +54,24 @@ import java.util.List;
 public class UserController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+
+    @Value("${pagehelper.helperDialect}")
+    private String name;    //只需要在yml文件里配了pagehelper.helperDialect即可。另一种是在方法内获取，用ResourceBundle.getBundle("config/wangyiyunxin")获取，整合IM时用到了
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @Autowired
     private UserService userService;
     @Autowired
     private RedisUtil redisUtil;
+    @Resource
+    private ExecutorService executorService;
 
     @ResponseBody
     @PostMapping("/addDomain")
+    @CacheEvict(value = CacheConstant.DOMAIN_INFO_CACHE)   //增删改都要清空encache缓存
     public int addDomain(UserDomain user){
         int mobile_code = (int) ((Math.random() * 9 + 1) * 100000);
         boolean flag = redisUtil.set(user.getPhone(),String.valueOf(mobile_code), 100);
@@ -73,7 +100,7 @@ public class UserController {
                     int pageSize,
             @RequestParam(name = "phone", required = false, defaultValue = "10")
                     String phone){
-        logger.info("查询所有的UserDomain");
+        /*logger.info("查询所有的UserDomain");*/
         String mobileCode = redisUtil.get(phone);
         /*if (mobileCode == null) {
             return 0;
@@ -82,11 +109,40 @@ public class UserController {
         redisUtil.del(phone);
         return userService.findAllUser(pageNum,pageSize);
     }
+    @ResponseBody
+    @GetMapping("/getUserDomain")
+    public Object findAllUser(@RequestParam("userId") Integer userId){
+        return userService.findUserById(userId);
+    }
+
+
 
     //验证springboot引入JWT
     @PostMapping("/login")
     @ResponseBody
     public Object login(HttpServletRequest request,@RequestBody SysUser user){
+
+        /**
+         *im注册测试：用户注册时创建网易云信id即token，将accid和token都存入用户表中，跟网易云信的沟通主要通过accid
+         */
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("accid", String.valueOf(SnowFlake.getSnowFlake().nextId())));
+        nvps.add(new BasicNameValuePair("name", user.getUserName()));
+        HashMap hashMap = Request163HttpUtil.httpRequest(RequestURLUtilEnum.CREATE_ACCID.getUrl(),nvps);   //创建网易云通信ID
+        String result = (String) hashMap.get("result");
+        int code = (Integer)hashMap.get("code");
+        com.alibaba.fastjson.JSONObject object = (com.alibaba.fastjson.JSONObject)hashMap.get("info");
+        String token = (String)object.get("token");
+        String accid = (String)object.get("accid");
+        //注册时，用户填充信息md5密码盐和加密后的密码
+        String salt = oConvertUtils.randomGen(8);
+        /*user.setSalt(salt);*/
+        String passwordEncode = PasswordUtil.encrypt(user.getUserName(), user.getPassword(), salt);
+        /*user.setPassword(passwordEncode);*/
+        /**
+         *
+         */
+
         JSONObject jsonObject=new JSONObject();
         SysUser userForBase=userService.findByUserName(user.getUserName());
         if(userForBase==null){
@@ -100,11 +156,11 @@ public class UserController {
                 //第一种生成token的方法，把用户ID存入token中
                 /*String token = getToken(userForBase);*/
                 //第二种生成token的方法，把用户名称存入token中，并设置了过期时间
-                String token = JwtUtil.sign(userForBase.getUserName(),userForBase.getPassword());
-                redisUtil.set(CommonConstant.PREFIX_USER_TOKEN + token, token);
-                redisUtil.expire(CommonConstant.PREFIX_USER_TOKEN + token, JwtUtil.EXPIRE_TIME / 1000);  // 设置超时时间
+                String token1 = JwtUtil.sign(userForBase.getUserName(),userForBase.getPassword());
+                redisUtil.set(CommonConstant.PREFIX_USER_TOKEN + token1, token1);
+                redisUtil.expire(CommonConstant.PREFIX_USER_TOKEN + token1, JwtUtil.EXPIRE_TIME / 1000);  // 设置超时时间
 
-                jsonObject.put("token", token);
+                jsonObject.put("token", token1);
                 jsonObject.put("user", userForBase);
 
                 String requestURI = request.getRequestURI();
@@ -253,13 +309,13 @@ public class UserController {
     @GetMapping("/all1")
     @ResponseBody
     public Object all1() {
-        logger.info("多数据源查询数据库1中的数据");
+        /*logger.info("多数据源查询数据库1中的数据");*/
         return userService.findAll1();
     }
     @GetMapping("/all2")
     @ResponseBody
     public Object all2() {
-        logger.info("多数据源查询数据库2中的数据");
+        /*logger.info("多数据源查询数据库2中的数据");*/
         return userService.findAll2();
     }
     @GetMapping("/add1")
@@ -274,5 +330,76 @@ public class UserController {
     }
 
 
+    //多线程1:最简单的Runnable
+    @PostMapping("thread1")
+    public void thread1(@RequestParam("msg") String msg){
+        System.out.println(Thread.currentThread().getName()+":"+msg);
+        Runnable runnable = dealMsg(msg);
+        //将返回的runnable对象传入，并start()启动线程
+        new Thread(runnable).start();
+    }
+    //创建一个Runnable，重写run方法
+    public Runnable dealMsg(String msg){
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("新开线程("+Thread.currentThread().getName()+")处理:"+msg);
+            }
+        };
+        return runnable;
+    }
+    //多线程2:在代码中启动异步处理最简单的代码
+    @PostMapping("thread2")
+    public void thread2(String msg){
+        System.out.println(Thread.currentThread().getName()+":"+msg);
+        new Thread(()->doReplace(msg)).start();
+    }
+    public void doReplace(String msg){
+        //异步处理的业务
+        System.out.println("新开线程("+Thread.currentThread().getName()+")处理:"+msg);
+    }
+    //多线程3：
+    @PostMapping("/thread3")
+    public void thread3(String msg){
+        System.out.println(Thread.currentThread().getName()+":"+msg);
+
+        /**
+         * 分类1：可以返回值的 Callable
+         */
+        Future fal  = executorService.submit(new Callable<String>() {
+            @Override
+            public String call() {
+                System.out.println(Thread.currentThread().getName()+":"+msg);
+                return "处理成功！";
+            }
+        });
+
+        try {
+            System.out.println(fal.get());
+        }catch (Exception e){
+            System.out.println(e);
+        }
+
+        /**
+         * 分类2：不会返回值的 Runnable
+         */
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(Thread.currentThread().getName()+":"+msg);
+            }
+        });
+
+        /**
+         * 分类3：也可以这样
+         */
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(Thread.currentThread().getName()+":"+msg);
+            }
+        });
+
+    }
 
 }

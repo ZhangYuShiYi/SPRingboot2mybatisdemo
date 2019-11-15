@@ -1,9 +1,11 @@
 package com.winterchen.model;
 
+import java.io.Serializable;
+
 /**
  * Created by zy on 2019/8/2.
  */
-public class UserDomain {
+public class UserDomain implements Serializable{
 
     private Integer userId;
 
