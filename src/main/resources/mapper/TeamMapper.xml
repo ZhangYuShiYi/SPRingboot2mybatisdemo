@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.winterchen.easemob.bussiness.mapper.TeamMapper" >
+  <resultMap id="BaseResultMap" type="com.winterchen.easemob.bussiness.model.TeamModel" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="shop_id" property="shopId" jdbcType="BIGINT" />
+    <result column="owner" property="owner" jdbcType="BIGINT" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="result" property="result" jdbcType="INTEGER" />
+    <result column="number" property="number" jdbcType="INTEGER" />
+    <result column="pay_way" property="payWay" jdbcType="INTEGER" />
+    <result column="sex_want" property="sexWant" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="chat_group_id" property="chatGroupId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, shop_id, owner, start_time, type, status, result, number, pay_way, sex_want, 
+    create_time, update_time, chat_group_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from team
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from team
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.winterchen.easemob.bussiness.model.TeamModel" >
+    insert into team (id, shop_id, owner, 
+      start_time, type, status, 
+      result, number, pay_way, 
+      sex_want, create_time, update_time, 
+      chat_group_id)
+    values (#{id,jdbcType=BIGINT}, #{shopId,jdbcType=BIGINT}, #{owner,jdbcType=BIGINT}, 
+      #{startTime,jdbcType=TIMESTAMP}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{result,jdbcType=INTEGER}, #{number,jdbcType=INTEGER}, #{payWay,jdbcType=INTEGER}, 
+      #{sexWant,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{chatGroupId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.winterchen.easemob.bussiness.model.TeamModel" >
+    insert into team
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="shopId != null" >
+        shop_id,
+      </if>
+      <if test="owner != null" >
+        owner,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="result != null" >
+        result,
+      </if>
+      <if test="number != null" >
+        number,
+      </if>
+      <if test="payWay != null" >
+        pay_way,
+      </if>
+      <if test="sexWant != null" >
+        sex_want,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="chatGroupId != null" >
+        chat_group_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="shopId != null" >
+        #{shopId,jdbcType=BIGINT},
+      </if>
+      <if test="owner != null" >
+        #{owner,jdbcType=BIGINT},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="result != null" >
+        #{result,jdbcType=INTEGER},
+      </if>
+      <if test="number != null" >
+        #{number,jdbcType=INTEGER},
+      </if>
+      <if test="payWay != null" >
+        #{payWay,jdbcType=INTEGER},
+      </if>
+      <if test="sexWant != null" >
+        #{sexWant,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="chatGroupId != null" >
+        #{chatGroupId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.winterchen.easemob.bussiness.model.TeamModel" >
+    update team
+    <set >
+      <if test="shopId != null" >
+        shop_id = #{shopId,jdbcType=BIGINT},
+      </if>
+      <if test="owner != null" >
+        owner = #{owner,jdbcType=BIGINT},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="result != null" >
+        result = #{result,jdbcType=INTEGER},
+      </if>
+      <if test="number != null" >
+        number = #{number,jdbcType=INTEGER},
+      </if>
+      <if test="payWay != null" >
+        pay_way = #{payWay,jdbcType=INTEGER},
+      </if>
+      <if test="sexWant != null" >
+        sex_want = #{sexWant,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="chatGroupId != null" >
+        chat_group_id = #{chatGroupId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.winterchen.easemob.bussiness.model.TeamModel" >
+    update team
+    set shop_id = #{shopId,jdbcType=BIGINT},
+      owner = #{owner,jdbcType=BIGINT},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      type = #{type,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      result = #{result,jdbcType=INTEGER},
+      number = #{number,jdbcType=INTEGER},
+      pay_way = #{payWay,jdbcType=INTEGER},
+      sex_want = #{sexWant,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      chat_group_id = #{chatGroupId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectTeamById" resultMap="BaseResultMap">
+    select * from team where id = #{teamId}
+  </select>
+
+  <select id="checkUserStartTeam" resultMap="BaseResultMap">
+    SELECT
+    t.*
+    FROM team t
+    WHERE t.owner = #{userId}
+    AND t.shop_id = #{shopId}
+    AND t.status = 0
+  </select>
+</mapper>

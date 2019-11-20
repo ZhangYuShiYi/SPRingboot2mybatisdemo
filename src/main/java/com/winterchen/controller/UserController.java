@@ -59,10 +59,10 @@ public class UserController {
     @Value("${pagehelper.helperDialect}")
     private String name;    //只需要在yml文件里配了pagehelper.helperDialect即可。另一种是在方法内获取，用ResourceBundle.getBundle("config/wangyiyunxin")获取，整合IM时用到了
 
-    @Autowired
+    @Resource
     private CacheManager cacheManager;
 
-    @Autowired
+    @Resource
     private UserService userService;
     @Autowired
     private RedisUtil redisUtil;

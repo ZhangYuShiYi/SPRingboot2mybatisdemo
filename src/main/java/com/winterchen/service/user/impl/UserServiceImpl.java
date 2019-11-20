@@ -4,6 +4,7 @@ import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.winterchen.dao.UserDao;
+import com.winterchen.easemob.service.ChatService;
 import com.winterchen.model.SysUser;
 import com.winterchen.model.UserDomain;
 import com.winterchen.mutildatabaseTransactionAop.MyDataSource;
@@ -29,6 +30,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserDao userDao;//这里会报错，但是并不会影响
 
+    @Autowired
+    private ChatService chatService;
+
 
     @Override
     public int addUser(UserDomain user) {
@@ -38,6 +42,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int addSysUser(SysUser user) {
+        //用户修改个人信息时，也要同步更新环信上的信息
+        if(user.getId() != null){
+            int i = userDao.updateSysUserById(user);
+            if(i > 0) {
+                chatService.updateUser(""+user.getId(), user.getUserName());
+            }
+            return i;
+        }
+        user.setId(SnowFlake.getSnowFlake().nextId());
         return userDao.addSysUser(user);
     }
 
@@ -255,7 +268,15 @@ public class UserServiceImpl implements UserService {
         throw new RuntimeErrorException(new Error("error!!!!!"));
     }
 
+    @Override
+    public SysUser getUserByPhone(String phone) {
+        return userDao.getUserByPhone(phone);
+    }
 
+    @Override
+    public Integer updateChatMD5(Long userId, String chatPwd) {
+        return userDao.updateChatMD5(userId,chatPwd);
+    }
 
 
 }

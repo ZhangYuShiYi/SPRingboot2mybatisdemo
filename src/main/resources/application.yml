@@ -55,4 +55,20 @@ pagehelper:
 swagger:
     enable: true
 
+easemob:
+   host: http://a1.easemob.com/
+   orgName: 1113190505010089
+   appName: joyzone
+   grantType: client_credentials
+   clientId: YXA6eWR-kG9AEemCpmWWikCXLA
+   clientSecret: YXA6XYMzIlVp-y-0BcbYbuxQC1nbDCg
 
+ali:
+  oss:
+    secretId: LTAI4FhPLUnfs3buVqXJxe86
+    secretKey: YpWzyGQsJOEeqrVSiLkOVEnRNgbBgi
+    bucket: 9da
+    domain: oss-cn-shenzhen.aliyuncs.com
+  sms:
+    codeTemplateCode: SMS_173348940
+    signName: 九达缘起

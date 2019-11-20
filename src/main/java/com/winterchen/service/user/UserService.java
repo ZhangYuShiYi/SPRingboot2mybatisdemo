@@ -42,6 +42,7 @@ public interface UserService {
     Long add1(String userName,String password);
     Long add2(String userName,String password);
 
-
+    SysUser getUserByPhone(String phone);
+    Integer updateChatMD5(Long userId, String chatPwd);
 
 }

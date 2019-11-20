@@ -35,4 +35,10 @@ public interface UserDao {
     List<SysUser> getUserList();
 
     int saveSysUser(SysUser sysUser);
+
+    SysUser getUserByPhone(@Param("phone") String phone);
+
+    int updateSysUserById(SysUser sysUser);
+
+    Integer updateChatMD5(@Param("userId")Long userId, @Param("chatPwd")String chatPwd);
 }

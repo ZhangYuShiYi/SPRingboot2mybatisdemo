@@ -28,8 +28,8 @@
 
     <insert id="addSysUser" >
         insert into
-		sys_user(id,user_name,password)
-		values (#{id},#{userName},#{password})
+		sys_user(id,user_name,password,phone,chat_id_md5)
+		values (#{id},#{userName},#{password},#{phone},#{chatIdMd5})
     </insert>
 
     <select id="selectUsers" resultType="com.winterchen.model.UserDomain">
@@ -51,7 +51,9 @@
         SELECT
         id,
         user_name as userName,
-        password
+        password,
+        phone,
+        chat_id_md5 as chatIdMd5
         FROM
         sys_user
         where user_name = #{userName}
@@ -90,7 +92,9 @@
         SELECT
         id,
         user_name as userName,
-        password
+        password,
+        phone,
+        chat_id_md5 as chatIdMd5
         FROM
         sys_user
     </select>
@@ -99,12 +103,46 @@
         INSERT INTO
         sys_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            id,user_name,password,
+            id,user_name,password,phone,chat_id_md5
         </trim>
         <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
-            #{id, jdbcType=BIGINT},#{userName, jdbcType=VARCHAR},#{password, jdbcType=VARCHAR},
+            #{id, jdbcType=BIGINT},#{userName, jdbcType=VARCHAR},#{password, jdbcType=VARCHAR},#{phone, jdbcType=VARCHAR},#{chatIdMd5, jdbcType=VARCHAR}
         </trim>
     </insert>
+
+    <select id="getUserByPhone" resultType="com.winterchen.model.SysUser">
+        SELECT
+        id,
+        user_name as userName,
+        password,
+        phone,
+        chat_id_md5 as chatIdMd5
+        FROM
+        sys_user
+        WHERE phone = #{phone}
+    </select>
+
+    <update id="updateSysUserById" parameterType="com.winterchen.model.SysUser">
+        update sys_user
+        set
+        <if test="userName != null">
+            user_name = #{userName,jdbcType=VARCHAR},
+        </if>
+        <if test="password != null">
+            password = #{password,jdbcType=VARCHAR},
+        </if>
+        <if test="phone != null">
+            phone = #{phone,jdbcType=VARCHAR},
+        </if>
+        <if test="chatIdMd5 != null">
+            chat_id_md5 = #{chatIdMd5,jdbcType=VARCHAR},
+        </if>
+        where id = #{id}
+    </update>
+
+    <update id="updateChatMD5">
+        update sys_user set chat_id_md5 = #{chatPwd} where id = ${userId}
+    </update>
 
 
 </mapper>
