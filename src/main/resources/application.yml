@@ -72,3 +72,6 @@ ali:
   sms:
     codeTemplateCode: SMS_173348940
     signName: 九达缘起
+
+fileSize: 2048000
+scale: 0.8
