@@ -125,7 +125,7 @@ public class UserController {
         /**
          *im注册测试：用户注册时创建网易云信id即token，将accid和token都存入用户表中，跟网易云信的沟通主要通过accid
          */
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        /*List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         nvps.add(new BasicNameValuePair("accid", String.valueOf(SnowFlake.getSnowFlake().nextId())));
         nvps.add(new BasicNameValuePair("name", user.getUserName()));
         HashMap hashMap = Request163HttpUtil.httpRequest(RequestURLUtilEnum.CREATE_ACCID.getUrl(),nvps);   //创建网易云通信ID
@@ -135,9 +135,9 @@ public class UserController {
         String token = (String)object.get("token");
         String accid = (String)object.get("accid");
         //注册时，用户填充信息md5密码盐和加密后的密码
-        String salt = oConvertUtils.randomGen(8);
+        String salt = oConvertUtils.randomGen(8);*/
         /*user.setSalt(salt);*/
-        String passwordEncode = PasswordUtil.encrypt(user.getUserName(), user.getPassword(), salt);
+//        String passwordEncode = PasswordUtil.encrypt(user.getUserName(), user.getPassword(), salt);
         /*user.setPassword(passwordEncode);*/
         /**
          *

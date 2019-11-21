@@ -10,4 +10,10 @@ public interface TeamService {
     int saveTeam(TeamModel teamModel);
 
     TeamModel selectTeamById(Long teamId);
+
+    String getGroupId(Long teamId);
+
+    boolean isTeamOwner(Long teamId, Long userId);
+
+    Integer updateTeamById(TeamModel teamModel);
 }

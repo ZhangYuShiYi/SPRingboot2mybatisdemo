@@ -65,6 +65,23 @@ public class TeamServiceImpl implements TeamService{
         return teamMapper.selectTeamById(teamId);
     }
 
+    @Override
+    public String getGroupId(Long teamId) {
+        return teamMapper.getGroupId(teamId);
+    }
+
+    @Override
+    public boolean isTeamOwner(Long teamId, Long userId) {
+        Integer i = teamMapper.checkTeamOwner(teamId, userId);
+        if(i != null && i.equals(1)) return true;
+        return false;
+    }
+
+    @Override
+    public Integer updateTeamById(TeamModel teamModel) {
+        return teamMapper.updateByPrimaryKeySelective(teamModel);
+    }
+
     public int saveTeamUsers(TeamModel teamModel,List<TeamModel> teamList){
         /*TeamUsersModel teamUsersModel = new TeamUsersModel();
         teamUsersModel.setTeamId(teamList.get(0).getId());
@@ -76,4 +93,6 @@ public class TeamServiceImpl implements TeamService{
         return flag;*/
         return 1;
     }
+
+
 }

@@ -8,6 +8,7 @@ import com.winterchen.easemob.bussiness.TeamService;
 import com.winterchen.easemob.bussiness.model.TeamModel;
 import com.winterchen.easemob.dto.EasemobUser;
 import com.winterchen.easemob.service.ChatService;
+import com.winterchen.easemob.service.GroupService;
 import com.winterchen.easemob.sms.SMSUtil;
 import com.winterchen.easemob.bussiness.util.ThreadLocalMap;
 import com.winterchen.model.SysUser;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -50,7 +52,8 @@ public class EasemobController {
     private RedisUtil redisUtil;
     @Resource
     private UserService userService;
-
+    @Autowired
+    private GroupService groupService;
     @Autowired
     private ChatService chatService;
     @Autowired
@@ -222,6 +225,115 @@ public class EasemobController {
         jsonObject.put("code","1");
         jsonObject.put("msg","操作失败！");
         return jsonObject;
+    }
+
+    @PostMapping("/joinTheTeam")
+    @ApiOperation("前端用户报名已有组队 @zhangyu")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户ID", required = true, dataType = "Long", paramType = "query"),
+            @ApiImplicitParam(name = "teamId", value = "组队ID", required = true, dataType = "Long", paramType = "query")
+    })
+    public R joinTheTeam(Long userId,Long teamId){
+        /*UserModel userModel = userSerivce.selectByKey(userId);
+        if(userModel ==null || userModel.getSex() == null || userModel.getUserName() == null || userModel.getBirthday() == null){
+            return R.error(100,"请完善个人必要信息：昵称/性别/生日");
+        }
+        TeamUsersModel teamUsersModel = teamUsersService.checkUserInTeam(model,userId,teamId);
+        if(teamUsersModel != null && teamUsersModel.getStatus() == 0){
+            return R.error("用户已报名该组队！");
+        }
+        if(teamUsersModel != null && teamUsersModel.getStatus() == 1){
+            teamUsersModel.setStatus(0);
+            teamUsersModel.setUpdateTime(new Date());
+            int result = teamUsersService.update(teamUsersModel);
+            checkTeamIfSuccess(teamId);
+            if(result == 1){
+                return R.ok("用户报名成功！");
+            }else {
+                return R.error("用户报名失败！");
+            }
+        }*/
+        String groupId = teamService.getGroupId(teamId);
+        chatService.joinTeamGroup(groupId,userId);// join the chat group
+        /*TeamUsersModel bean = new TeamUsersModel();
+        bean.setTeamId(teamId);
+        bean.setUserId(userId);
+        bean.setStatus(0);
+        bean.setCreateTime(new Date());
+        int ret = teamUsersService.save(bean);*/
+        int ret = 1;
+        if(ret == 1){
+            checkTeamIfSuccess(teamId);
+            Map<String,String> map = Maps.newHashMap();
+            map.put("chatGroupId", groupId);
+            return R.ok("用户报名成功！");
+        }else {
+            return R.error("用户报名失败！");
+        }
+    }
+
+    public void checkTeamIfSuccess(Long teamId){
+        /*Map<String,Object> teamInfo = teamService.checkTeamIfSuccess(teamId);
+        Integer number = (Integer) teamInfo.get("number");
+        Integer joinNum = Integer.parseInt(teamInfo.get("joinNum").toString());
+        if(number == joinNum){
+            TeamModel model = new TeamModel();
+            model.setId(teamId);
+            model.setResult(1);
+            model.setUpdateTime(new Date());
+            teamService.update(model);
+        }*/
+    }
+
+    @PostMapping("/quitTheTeam")
+    @ApiOperation("前端用户退出已有组队 @zhangyu")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "用户ID", required = true, dataType = "Long", paramType = "query"),
+            @ApiImplicitParam(name = "teamOrInvitingId", value = "组队ID或个人邀请ID", required = true, dataType = "Long", paramType = "query")
+    })
+    public R quitTheTeam(Long userId, Long teamOrInvitingId){
+        /*TeamUsersModel teamUsersModel = teamUsersService.checkUserInTeam(model,userId,teamOrInvitingId);
+        if(teamUsersModel == null){
+            return R.error("用户未报名该组队！");
+        }
+        if(teamUsersModel != null && teamUsersModel.getStatus() == 1){
+            return R.error("用户未报名该组队！");
+        }*/
+        //if(teamUsersModel != null && teamUsersModel.getStatus() == 0){
+            /*Map<String,Object> teamInfo = teamService.checkTeamIfSuccess(teamOrInvitingId);
+            Integer number = (Integer) teamInfo.get("number");
+            Integer joinNum = Integer.parseInt(teamInfo.get("joinNum").toString());
+            teamUsersModel.setStatus(1);
+            teamUsersModel.setUpdateTime(new Date());*/
+            boolean isOwner = teamService.isTeamOwner(teamOrInvitingId, userId);
+            if(isOwner) {
+                //userId为发起者时，删掉对应的群并吧team的状态要改为已失效，已失败。
+                groupService.deleteGroup(teamOrInvitingId);
+                TeamModel teamModel = new TeamModel();
+                teamModel.setId(teamOrInvitingId);
+                teamModel.setStatus(1);  //组队无效
+                teamModel.setResult(2);  //组队失败
+                teamModel.setUpdateTime(new Date());
+                int ret = teamService.updateTeamById(teamModel);
+                return R.ok("用户退出成功！");
+            }else {
+                //userId为参与者时，退出对应的群。且若number == joinNum时吧team的状态要改为已组队中。
+                groupService.cancelGroup(teamOrInvitingId, userId);
+                int result = 1; // teamUsersService.update(teamUsersModel);
+                if(result == 1){
+                    /*if(number == joinNum){
+                        TeamModel teamModel = new TeamModel();
+                        teamModel.setId(teamOrInvitingId);
+                        teamModel.setResult(0);
+                        teamModel.setUpdateTime(new Date());
+                        teamService.update(teamModel);
+                    }*/
+                    return R.ok("用户退出成功！");
+                }else {
+                    return R.error("用户退出失败！");
+                }
+            }
+       // }
     }
 
 

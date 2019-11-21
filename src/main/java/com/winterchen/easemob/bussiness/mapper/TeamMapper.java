@@ -22,4 +22,8 @@ public interface TeamMapper {
     TeamModel selectTeamById(@Param("teamId") Long teamId);
 
     List<TeamModel> checkUserStartTeam(@Param("userId") Long userId, @Param("shopId") Long shopId);
+
+    String getGroupId(@Param("teamId") Long teamId);
+
+    Integer checkTeamOwner(@Param("teamId") Long teamId, @Param("userId") Long userId);
 }
