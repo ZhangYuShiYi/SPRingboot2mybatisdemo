@@ -11,9 +11,12 @@ spring:
       db1:
         driver-class-name: com.mysql.cj.jdbc.Driver
         #基本属性
-        jdbc-url: jdbc:mysql://127.0.0.1:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false
+        #jdbc-url: jdbc:mysql://127.0.0.1:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false      #localhost
+        jdbc-url: jdbc:mysql://47.106.159.60:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false  #aliyunReal
+        #jdbc-url: jdbc:mysql://192.168.43.182:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false  #vmware
         username: root
         password: root
+        #password: shiyi261128   #vmware时密码换了
         initial-size: 5
         max-idle: 10
         max-wait: 10000
@@ -21,9 +24,12 @@ spring:
       db2:
         driver-class-name: com.mysql.cj.jdbc.Driver
         #基本属性
-        jdbc-url: jdbc:mysql://127.0.0.1:3306/springboottest1?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false
+        #jdbc-url: jdbc:mysql://127.0.0.1:3306/springboottest1?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false     #localhost
+        jdbc-url: jdbc:mysql://47.106.159.60:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false  #aliyunReal
+        #jdbc-url: jdbc:mysql://192.168.43.182:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false  #vmware
         username: root
         password: root
+        #password: shiyi261128
         initial-size: 5
         max-idle: 10
         max-wait: 10000

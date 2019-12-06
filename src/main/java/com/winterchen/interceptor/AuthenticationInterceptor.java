@@ -77,6 +77,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 } catch (JWTVerificationException e) {
                     throw new RuntimeException("401");
                 }
+                //return false;  false则表示不会访问该接口
                 return true;
             }
         }
