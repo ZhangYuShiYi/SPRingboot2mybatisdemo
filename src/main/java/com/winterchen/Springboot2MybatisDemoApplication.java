@@ -17,7 +17,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableCaching//启动类启动时会去启动缓存启动器 @Cacheable  @CacheEvict
 @ServletComponentScan //Servlet、Filter、Listener 可以直接通过 @WebServlet(urlPatterns = "/test/*")、@WebFilter、@WebListener 注解自动注册
 @EnableScheduling  //开启定时任务
-public class Springboot2MybatisDemoApplication{
+public class Springboot2MybatisDemoApplication /*extends SpringBootServletInitializer*/ {
+
+	/*@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+		// 注意这里要指向原先用main方法执行的Application启动类  打war包时：需继承并重写该方法
+		return builder.sources(Springboot2MybatisDemoApplication.class);
+	}*/
 
 	public static void main(String[] args) {
 		SpringApplication.run(Springboot2MybatisDemoApplication.class, args);
