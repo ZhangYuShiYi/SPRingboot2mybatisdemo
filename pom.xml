@@ -250,6 +250,11 @@
 			<artifactId>jmimemagic</artifactId>
 			<version>0.1.5</version>
 		</dependency>
+		<!-- 16、整合RabbitMQ依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-amqp</artifactId>
+		</dependency>
 
 
 	</dependencies>

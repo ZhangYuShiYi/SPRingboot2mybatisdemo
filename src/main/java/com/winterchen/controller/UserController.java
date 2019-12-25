@@ -4,6 +4,8 @@ import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.winterchen.MQ.rabbitMQ.UserDemo;
+import com.winterchen.MQ.rabbitMQ.provider.OneToOneProvider;
 import com.winterchen.annotation.UserLoginToken;
 import com.winterchen.im.Request163HttpUtil;
 import com.winterchen.im.RequestURLUtilEnum;
@@ -68,6 +70,8 @@ public class UserController {
     private RedisUtil redisUtil;
     @Resource
     private ExecutorService executorService;
+    @Resource
+    private OneToOneProvider oneToOneProvider;
 
     @ResponseBody
     @PostMapping("/addDomain")
@@ -401,5 +405,33 @@ public class UserController {
         });
 
     }
+
+    /*RabbitMQ*/
+    /** * 最简单的hello生产和消费实现（单生产者和单消费者） */
+    @PostMapping("/hello")
+    public void hello() {
+        oneToOneProvider.sendMessage();
+    }
+    /**
+     * 实体列的传输
+     */
+    @PostMapping("/userTest")
+    public void userTest(){
+        UserDemo user=new UserDemo();
+        user.setName("韩旭杰");
+        user.setPass("123456");
+        oneToOneProvider.sendEntity(user);
+    }
+    //交换机为direct的消息队列
+    @PostMapping("/directTest")
+    public void directTest() {
+        oneToOneProvider.sendDirect();
+    }
+    /** * topic exchange类型rabbitmq测试 */
+    @PostMapping("/topicTest")
+    public void topicTest() {
+        oneToOneProvider.sendTopic();
+    }
+
 
 }
