@@ -412,9 +412,7 @@ public class UserController {
     public void hello() {
         oneToOneProvider.sendMessage();
     }
-    /**
-     * 实体列的传输
-     */
+    //实体类的传输
     @PostMapping("/userTest")
     public void userTest(){
         UserDemo user=new UserDemo();
@@ -432,6 +430,10 @@ public class UserController {
     public void topicTest() {
         oneToOneProvider.sendTopic();
     }
-
+    /** * fanout exchange类型rabbitmq测试 */
+    @PostMapping("/fanoutTest")
+    public void fanoutTest() {
+        oneToOneProvider.sendFanout();
+    }
 
 }

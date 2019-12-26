@@ -52,5 +52,12 @@ public class OneToOneProvider {
         System.out.println("sender2 : " + msg2);
         this.rabbitTemplate.convertAndSend("exchange", "topic.messages", msg2);
     }
+    //交换机为fanout的消息队列
+    public void sendFanout() {
+        String msgString="fanoutSender :hello i am hzb";
+        System.out.println(msgString);
+        // 参数2被忽略
+        this.rabbitTemplate.convertAndSend("fanoutExchange","", msgString);
+    }
 
 }
