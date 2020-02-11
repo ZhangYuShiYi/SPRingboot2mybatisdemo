@@ -11,7 +11,8 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })  //禁用数据源的自动配置类DataSourceAutoConfiguration
+@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class,
+		org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class})
 @MapperScan({"com.winterchen.dao","com.winterchen.easemob.bussiness.mapper"})  //开启mybatis
 @EnableSwagger2  //开启swagger
 @EnableCaching//启动类启动时会去启动缓存启动器 @Cacheable  @CacheEvict

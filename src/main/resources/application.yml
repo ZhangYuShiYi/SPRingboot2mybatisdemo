@@ -7,6 +7,12 @@ server:
 
 
 spring:
+    activiti:
+        database-schema-update: true
+        history-level: full
+        db-history-used: true
+        #自动检查、部署流程定义文件
+        check-process-definitions: false
     datasource:
       db1:
         driver-class-name: com.mysql.cj.jdbc.Driver

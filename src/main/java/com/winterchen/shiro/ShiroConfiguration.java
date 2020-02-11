@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * Created by zy on 2019/10/10.
  */
-@Component
+/*@Component*/
 public class ShiroConfiguration {
 
     /**
