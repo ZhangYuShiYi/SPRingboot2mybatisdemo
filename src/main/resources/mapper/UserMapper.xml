@@ -144,5 +144,8 @@
         update sys_user set chat_id_md5 = #{chatPwd} where id = ${userId}
     </update>
 
+    <select id="getMaxIdInScheduleJob" resultType="java.lang.Integer">
+        SELECT MAX(id) as jobId FROM tbl_schedule_job
+    </select>
 
 </mapper>

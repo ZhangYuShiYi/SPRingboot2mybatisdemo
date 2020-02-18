@@ -41,4 +41,6 @@ public interface UserDao {
     int updateSysUserById(SysUser sysUser);
 
     Integer updateChatMD5(@Param("userId")Long userId, @Param("chatPwd")String chatPwd);
+
+    Integer getMaxIdInScheduleJob();
 }

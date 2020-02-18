@@ -126,10 +126,14 @@
 			<artifactId>spring-session-data-redis</artifactId>
 		</dependency>-->
 		<!-- 5、整合quartz定时任务 -->
-		<!--<dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-quartz</artifactId>
-		</dependency>-->
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
 		<!-- 6、整合JWT -->
 		<dependency>
 			<groupId>com.auth0</groupId>

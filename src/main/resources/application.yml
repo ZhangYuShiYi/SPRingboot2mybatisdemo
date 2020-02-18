@@ -7,6 +7,14 @@ server:
 
 
 spring:
+    jpa:
+        database: mysql
+        show-sql: true
+        hibernate:
+          ddl-auto: update
+          naming:
+            physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        database-platform: org.hibernate.dialect.MySQL5Dialect
     activiti:
         database-schema-update: true
         history-level: full
@@ -18,7 +26,7 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
         #基本属性
         #jdbc-url: jdbc:mysql://127.0.0.1:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false      #localhost
-        jdbc-url: jdbc:mysql://47.106.159.60:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false  #aliyunReal
+        jdbc-url: jdbc:mysql://47.106.159.60:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false&nullCatalogMeansCurrent=true  #aliyunReal
         #jdbc-url: jdbc:mysql://192.168.43.182:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false  #vmware
         username: root
         password: root
@@ -31,7 +39,7 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
         #基本属性
         #jdbc-url: jdbc:mysql://127.0.0.1:3306/springboottest1?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false     #localhost
-        jdbc-url: jdbc:mysql://47.106.159.60:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false  #aliyunReal
+        jdbc-url: jdbc:mysql://47.106.159.60:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false&nullCatalogMeansCurrent=true  #aliyunReal
         #jdbc-url: jdbc:mysql://192.168.43.182:3306/springboottest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=GMT&useSSL=false  #vmware
         username: root
         password: root
@@ -42,7 +50,7 @@ spring:
         min-idle: 5
 
     profiles:
-        include: redis,rabbitMQ
+        include: redis,rabbitMQ,quartz
     cache:
         #ehcache配置文件路径
         ehcache:
