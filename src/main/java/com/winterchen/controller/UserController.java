@@ -55,6 +55,8 @@ import java.util.concurrent.Future;
 @Api(tags = "集成测试相关接口",description = "UserController")
 public class UserController {
 
+    /*dev版本*/
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
